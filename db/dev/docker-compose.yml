@@ -1,0 +1,18 @@
+version: '3.1'
+
+services:
+    database:
+        # image: postgres:12
+        build:   
+          context: .
+        #restart: always
+        ports: 
+          - "5437:5432"
+        volumes:
+          - ./pgdata:/var/lib/postgresql/data
+    # # this is the standard data library in psql, and we want to copy it to our computer in folder /pgdata
+    #       - .:/code
+        environment:
+          POSTGRES_USER: 'upm_admin'
+          POSTGRES_PASSWORD: 'nYCdWEQzr1G5pCfA'
+          POSTGRES_DB: ''

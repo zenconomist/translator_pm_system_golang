@@ -1,0 +1,17 @@
+go 1.18
+
+use (
+	./
+	./packages/action
+	./packages/dbconn
+	./packages/dto
+	./packages/entities
+	./packages/dbq
+	./packages/environment
+	./packages/globalconstants
+	./packages/logging
+	./packages/server
+	./packages/services
+	./packages/msgraph
+	./packages/readfiles
+)

@@ -1,0 +1,16 @@
+package entities
+
+// ---------- GENERATED ---------- \\
+
+import (
+    "time"
+    dbc "dbconn"
+    "globalconstants"
+)
+
+type <<entity>> struct {
+    Model
+    <<entity.struct.fields>>
+}
+
+

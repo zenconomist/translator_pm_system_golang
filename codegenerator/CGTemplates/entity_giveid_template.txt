@@ -1,0 +1,5 @@
+
+
+func (item <<entity>>) GiveID() uint {
+	return item.Model.ID
+}

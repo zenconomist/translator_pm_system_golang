@@ -1,0 +1,6 @@
+
+type <<entity>> struct {
+    Model
+    <<entity.struct.fields>>
+}
+

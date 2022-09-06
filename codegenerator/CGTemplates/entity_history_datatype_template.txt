@@ -1,0 +1,31 @@
+
+type <<entity>>History struct {
+    HistoryModel
+    <<entity.struct.fields>>
+}
+
+func (item *<<entity>>History) SetModelToCreated(id uint) {
+	item.HistoryModel.OriginalID = id
+	item.HistoryModel.FlgIsCurrent = true
+	item.HistoryModel.FlgIsDeleted = false
+	item.HistoryModel.DatFrom = time.Now()
+	item.HistoryModel.DatTo = globalconstants.Infinity
+}
+
+func (item *<<entity>>History) SetModelToUpdated(id uint) {
+	item.HistoryModel.OriginalID = id
+	item.HistoryModel.FlgIsCurrent = false
+	item.HistoryModel.FlgIsDeleted = false
+	item.HistoryModel.DatTo = time.Now()
+}
+
+func (item *<<entity>>History) SetModelToDeleted(id uint) {
+	item.HistoryModel.OriginalID = id
+	item.HistoryModel.FlgIsCurrent = false
+	item.HistoryModel.FlgIsDeleted = true
+	item.HistoryModel.DatTo = time.Now()
+}
+
+func (item *<<entity>>History) GiveID() uint {
+	return item.HistoryModel.ID
+}

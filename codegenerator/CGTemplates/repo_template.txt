@@ -1,0 +1,62 @@
+package repositories
+
+// ---------- GENERATED ---------- \\
+
+import (
+	"entities"
+	enviro "environment"
+
+	"gorm.io/gorm"
+)
+
+type <<entity>>RepositoryInterface interface {
+	FindAll() ([]entities.<<entity>>, error)
+	FindAllWithIDs([]uint) ([]entities.<<entity>>, error)
+	FindByID(id uint) (entities.<<entity>>, error)
+	Create(entities.<<entity>>) (uint, error)
+	Save(entities.<<entity>>) error
+	Delete(id uint) error
+}
+
+type <<entity.lowercase>>Repo struct {
+	DB *gorm.DB
+}
+
+func New<<entity>>Repository(env enviro.Environment) <<entity>>RepositoryInterface {
+	return &<<entity.lowercase>>Repo{
+		DB: env.GiveDbHandler().PassConnection(),
+	}
+}
+
+func (u *<<entity.lowercase>>Repo) FindAll() ([]entities.<<entity>>, error) {
+	var <<entity.lowercase>>s []entities.<<entity>>
+	result := u.DB.Where("active = ?", true).Find(&<<entity.lowercase>>s)
+	return <<entity.lowercase>>s, result.Error
+}
+
+func (u *<<entity.lowercase>>Repo) FindAllWithIDs(ids []uint) ([]entities.<<entity>>, error) {
+	var <<entity.lowercase>>s []entities.<<entity>>
+	result := u.DB.Where("active = ?", true).Find(&<<entity.lowercase>>s, ids)
+	return <<entity.lowercase>>s, result.Error
+}
+
+func (u *<<entity.lowercase>>Repo) FindByID(id uint) (entities.<<entity>>, error) {
+	var <<entity.lowercase>> entities.<<entity>>
+	result := u.DB.Where("active = ?", true).First(&<<entity.lowercase>>, id)
+	return <<entity.lowercase>>, result.Error
+}
+
+func (u *<<entity.lowercase>>Repo) Create(<<entity.lowercase>> entities.<<entity>>) (uint, error) {
+	result := u.DB.Create(&<<entity.lowercase>>)
+	return <<entity.lowercase>>.ID, result.Error
+}
+
+func (u *<<entity.lowercase>>Repo) Save(<<entity.lowercase>> entities.<<entity>>) error {
+	result := u.DB.Save(&<<entity.lowercase>>)
+	return result.Error
+}
+
+func (u *<<entity.lowercase>>Repo) Delete(id uint) error {
+	result := u.DB.Delete(id)
+	return result.Error
+}

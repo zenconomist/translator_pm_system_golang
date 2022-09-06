@@ -1,0 +1,15 @@
+-- create problems
+
+First I wasn't able to add new items, because gorm.Model didn't have 'autoIncrement' at the ID, so I had to add it. 
+Unless added, at Create, I added .Omit("id") to the Create statement, just like at Postgres (where this works 
+seamlessly), but at Sql Server it always wants to set identity_insert on and off at the insert stmts, unless 
+your ID has this autoIncrement gorm tag.
+I basically copied the gorm.Model into my own Model struct and there I added the tag. Since for Postgre it doesn't
+matter.
+
+-- problems @ migration
+
+a) create table issues
+I couldn't migrate all my entities in one set. Somehow the Task and the Project tables had to be added
+generally in another db session (migration func called in a separate go run main.go statement). At last,
+they were added, but only in a separate session. (I didn't try to establish a new connection.)

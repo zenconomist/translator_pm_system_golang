@@ -1,0 +1,64 @@
+
+
+func (sh ServerHandler) GetAll<<entity>>(w http.ResponseWriter, r *http.Request) {
+	w.Header().Set("Context-Type", "application/json")
+	w.Header().Set("Access-Control-Allow-Origin", "*")
+	w.Header().Set("Access-Control-Allow-Methods", "GET")
+	w.Header().Set("Access-Control-Allow-Headers", "Content-Type")
+	logger := sh.env.GiveLogger()                                          // getting pointer of initialized logger
+	logger.InitLoggerPerFunc(logger.GetCurrentFuncName(), "add <<entity.lowercase>> init") // initializing logger data for handler
+	defer logger.Log()
+
+	defer sh.recoverFromPanic() //default panic->recover
+	res := Response{
+		Message: "getting <<entity.lowercase>>",
+	}
+
+	service := services.NewService(entities.NewRepository(sh.env.GiveDbHandler().PassConnection(), entities.<<entity>>{}), sh.env, &dto.<<entity>>ResponseDTO{}, entities.<<entity>>{}, &entities.<<entity>>History{})
+	<<entity.lowercase>>s, errService := service.GetItems()
+	if errService != nil {
+		logger.LogError(errService)
+		res.Message = fmt.Sprintf("service error: %v", errService)
+		json.NewEncoder(w).Encode(res)
+		return
+	}
+	json.NewEncoder(w).Encode(<<entity.lowercase>>s)
+
+}
+
+func (sh ServerHandler) Get<<entity>>ByID(w http.ResponseWriter, r *http.Request) {
+	w.Header().Set("Context-Type", "application/json")
+	w.Header().Set("Access-Control-Allow-Origin", "*")
+	w.Header().Set("Access-Control-Allow-Methods", "GET")
+	w.Header().Set("Access-Control-Allow-Headers", "Content-Type")
+	logger := sh.env.GiveLogger()                                          // getting pointer of initialized logger
+	logger.InitLoggerPerFunc(logger.GetCurrentFuncName(), "add <<entity.lowercase>> init") // initializing logger data for handler
+	defer logger.Log()
+
+	defer sh.recoverFromPanic() //default panic->recover
+	res := Response{
+		Message: "getting <<entity.lowercase>>",
+	}
+
+	vars := mux.Vars(r)
+	id, _ := vars["id"]
+	idInt, errConv := strconv.Atoi(id)
+	if errConv != nil {
+		defer logger.LogError(errConv)
+		res.Message = fmt.Sprintf("couldn't convert given id, error: %v", errConv)
+		json.NewEncoder(w).Encode(res)
+		return
+	}
+	Id := uint(idInt)
+
+	service := services.NewService(entities.NewRepository(sh.env.GiveDbHandler().PassConnection(), entities.<<entity>>{}), sh.env, &dto.<<entity>>ResponseDTO{}, entities.<<entity>>{}, &entities.<<entity>>History{})
+	<<entity.lowercase>>, errService := service.GetItemByID(Id)
+	if errService != nil {
+		defer logger.LogError(errService)
+		res.Message = fmt.Sprintf("service error: %v", errService)
+		json.NewEncoder(w).Encode(res)
+		return
+	}
+	json.NewEncoder(w).Encode(<<entity.lowercase>>)
+
+}

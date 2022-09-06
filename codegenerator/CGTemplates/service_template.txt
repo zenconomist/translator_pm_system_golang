@@ -1,0 +1,138 @@
+package services
+
+// ---------- GENERATED ---------- \\
+
+import (
+	"dto"
+	"entities"
+	"environment"
+	"fmt"
+	gconst "globalconstants"
+	"repositories"
+	"strings"
+
+	am "github.com/stroiman/go-automapper"
+	"gorm.io/gorm"
+)
+
+/*
+	Main responsibilities of services:
+		1. Dto mapping between dto's and entities
+		2. Error logging from repositories
+        3. Validations
+*/
+
+type <<entity>>Service interface {
+	GetItems() ([]entities.<<entity>>, error)
+	GetItemByID(uint) (entities.<<entity>>, error)
+	CreateNewItem(dto.<<entity>>DTO) (uint, error)
+	UpdateItem(dto.<<entity>>DTO) error
+	DeleteItem(uint) error
+	GiveDb() *gorm.DB
+}
+
+type <<entity.lowercase>>Service struct {
+	<<entity>>Repo repositories.<<entity>>RepositoryInterface
+	env      environment.Environment
+}
+
+func New<<entity>>Service(<<entity.lowercase>>Repo repositories.<<entity>>RepositoryInterface, env environment.Environment) <<entity>>Service {
+	return &<<entity.lowercase>>Service{
+		<<entity>>Repo: <<entity.lowercase>>Repo,
+		env:      env,
+	}
+}
+
+func (service *<<entity.lowercase>>Service) GiveDb() *gorm.DB {
+	return service.env.GiveDbHandler().PassConnection()
+}
+
+func (service *<<entity.lowercase>>Service) GetItems() ([]entities.<<entity>>, error) {
+	logger := service.env.GiveLogger()
+	logger.InitLoggerPerFunc(logger.GetCurrentFuncName(), "create new <<entity.lowercase>>")
+	<<entity.lowercase>>, err := service.<<entity>>Repo.FindAll()
+	if err != nil {
+		service.env.GiveLogger().LogError(err)
+        return <<entity.lowercase>>, err 
+	}
+    logger.Log()
+	return <<entity.lowercase>>, nil
+}
+
+func (service *<<entity.lowercase>>Service) GetItemByID(ID uint) (entities.<<entity>>, error) {
+	logger := service.env.GiveLogger()
+	logger.InitLoggerPerFunc(logger.GetCurrentFuncName(), "create new <<entity.lowercase>>")
+	<<entity.lowercase>>, err := service.<<entity>>Repo.FindByID(ID)
+	if err != nil {
+		service.env.GiveLogger().LogError(err)
+        return <<entity.lowercase>>, err 
+	}
+    logger.Log()
+	return <<entity.lowercase>>, nil
+}
+
+func (service *<<entity.lowercase>>Service) CreateNewItem(data dto.<<entity>>DTO) (uint, error) {
+	logger := service.env.GiveLogger()
+	logger.InitLoggerPerFunc(logger.GetCurrentFuncName(), "create new user")
+	
+    // dto -> entity mapping implementation + custom validations
+	//mapping begin
+	var defaultID uint
+	errCustDTOTransform := data.CustomDTOTransformations()
+	if errCustDTOTransform != nil {
+		logger.LogError(errCustDTOTransform)
+		return defaultID, errCustDTOTransform
+	}
+	// validations
+	errCustomValidations := data.CustomValidations(logger)
+	if errCustomValidations != nil {
+		logger.LogError(errCustomValidations)
+		return defaultID, errCustomValidations
+	}
+
+	// net mapping
+	<<entity.lowercase>>, errMap := data.MapToEntity()
+	if errMap != nil {
+		logger.LogError(errMap)
+		return defaultID, errMap
+	}
+
+	ID, err := service.<<entity>>Repo.Create(<<entity.lowercase>>)
+	if err != nil {
+		service.env.GiveLogger().LogError(err)
+        return ID, err
+	}
+    logger.Log()
+	return ID, err
+}
+
+func (service *<<entity.lowercase>>Service) UpdateItem(data dto.<<entity>>DTO) error {
+	logger := service.env.GiveLogger()
+	logger.InitLoggerPerFunc(logger.GetCurrentFuncName(), "create new <<entity.lowercase>>")
+
+	// dto -> entity mapping implementation
+    <<entity.lowercase>>, errMap := data.MapToEntity()
+	if errMap != nil {
+		logger.LogError(errMap)
+	}
+
+	err := service.<<entity>>Repo.Save(<<entity.lowercase>>)
+	if err != nil {
+		service.env.GiveLogger().LogError(err)
+	}
+    logger.Log()
+	return err
+}
+
+func (service *<<entity.lowercase>>Service) DeleteItem(id uint) error {
+	logger := service.env.GiveLogger()
+	logger.InitLoggerPerFunc(logger.GetCurrentFuncName(), "create new <<entity.lowercase>>")
+
+	err := service.<<entity>>Repo.Delete(id)
+	if err != nil {
+		service.env.GiveLogger().LogError(err)
+	}
+
+    logger.Log()
+	return err
+}

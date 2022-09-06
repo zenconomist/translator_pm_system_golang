@@ -1,0 +1,36 @@
+services
+    - taskStateService
+        - validations for taskstates
+        - actual state changes attributes also for taskstatechanges
+    - taskOfferedStateService
+        - documentation
+        - script / procedure and tables to create state machine pattern and load it with actual statechanges
+        - validations
+    - same as taskOfferedStateService for PrepareState / ReviewState / TaskTimeState / ProjectState / BatchState / ClientOfferState / ClientOfferTimeState / SupplierTimeState
+    - billingo integration service
+        - import basic code (how to make API call towards billingo to make billing happen)
+        - use sql script to retreive data to bill
+        - billingo partners integration -> customers
+dto
+    - run through all dto-s and make sure validations and parsing are ok
+    - import some extra dto-s from mmts3.4 and implement retreiving them
+logging
+    - finishing logging: go through all problems and determine wether it's critic or not -> create function for critic errors.
+
+tests
+    - state testing with json-s on tasks -> the whole process
+        1. creating new customer
+        2. integration with billingo
+        3. create new project for customer (and create second project for same customer)
+        4. check if task was created -> then create new task from configured tasktypes
+            4.1. create task 1 with prepare
+            4.2. create task 2 without prepare
+        5. offer tasks for test suppliers -> check emails sent per log
+        6. decline -> open state (check if it is open) -> reoffer
+        7. accept task -> check inprogress state
+        8. for task with prepare check if email was sent (per log)
+        9. test task from all states with pending state -> ask a question -> persist the question -> answer the question -> close the question either by pm or by preparer / supplier / reviewer
+            - pending with asking a question
+        10. set to ready from inprogress by supplier
+        11. revoke job from supplier -> set it back to open, and offer it to someone else
+        12. 

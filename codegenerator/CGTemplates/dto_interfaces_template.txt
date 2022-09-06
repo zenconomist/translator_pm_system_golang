@@ -1,0 +1,9 @@
+
+
+type <<entity>>DTO interface {
+	CustomDTOTransformations(*gorm.DB) error
+	CustomValidations(*gorm.DB, logging.Logger) error
+	GiveID() (uint, error)
+	MapToEntity(*gorm.DB) (entities.<<entity>>, error)
+	MapFromEntity(*gorm.DB, entities.<<entity>>) error
+}

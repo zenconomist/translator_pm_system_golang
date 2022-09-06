@@ -1,0 +1,7 @@
+
+type <<dto>> struct {
+    ID uint
+    <<dto.struct.fields>>
+}
+
+

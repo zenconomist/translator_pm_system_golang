@@ -1,0 +1,114 @@
+
+func (sh ServerHandler) AddNew<<entity>>(w http.ResponseWriter, r *http.Request) {
+	w.Header().Set("Context-Type", "application/json")
+	w.Header().Set("Access-Control-Allow-Origin", "*")
+	w.Header().Set("Access-Control-Allow-Methods", "POST")
+	w.Header().Set("Access-Control-Allow-Headers", "Content-Type")
+	logger := sh.env.GiveLogger()                                          // getting pointer of initialized logger
+	logger.InitLoggerPerFunc(logger.GetCurrentFuncName(), "add <<entity.lowercase>> init") // initializing logger data for handler
+	defer logger.Log()
+
+	defer sh.recoverFromPanic() //default panic->recover
+	res := Response{
+		Message: "new <<entity.lowercase>> adding process started",
+	}
+
+	entity := entities.<<entity>>{}
+	history := entities.<<entity>>History{}
+	dto := dto.<<entity>>RequestDTO{}
+	errJsonDecode := json.NewDecoder(r.Body).Decode(&dto)
+	if errJsonDecode != nil {
+		logger.LogError(errJsonDecode)
+		res.Message = fmt.Sprintf("json decoding error: %v", errJsonDecode)
+		json.NewEncoder(w).Encode(res)
+		return
+	}
+
+	service := services.NewService(entities.NewRepository(sh.env.GiveDbHandler().PassConnection(), entity), sh.env, &dto, entity, &history)
+	id, errService := service.CreateNewItem(&dto)
+	if errService != nil {
+		logger.LogError(errService)
+		res.Message = fmt.Sprintf("service error: %v", errService)
+		json.NewEncoder(w).Encode(res)
+		return
+	}
+	res.Message = fmt.Sprintf("New <<entity.lowercase>> created with ID: %d", id)
+	json.NewEncoder(w).Encode(res)
+
+}
+
+func (sh ServerHandler) Update<<entity>>(w http.ResponseWriter, r *http.Request) {
+	w.Header().Set("Context-Type", "application/json")
+	w.Header().Set("Access-Control-Allow-Origin", "*")
+	w.Header().Set("Access-Control-Allow-Methods", "PUT")
+	w.Header().Set("Access-Control-Allow-Headers", "Content-Type")
+	logger := sh.env.GiveLogger()                                          // getting pointer of initialized logger
+	logger.InitLoggerPerFunc(logger.GetCurrentFuncName(), "add <<entity.lowercase>> init") // initializing logger data for handler
+	defer logger.Log()
+
+	defer sh.recoverFromPanic() //default panic->recover
+	res := Response{
+		Message: "<<entity.lowercase>> updating process started",
+	}
+
+	entity := entities.<<entity>>{}
+	history := entities.<<entity>>History{}
+	dto := dto.<<entity>>RequestDTO{}
+	errJsonDecode := json.NewDecoder(r.Body).Decode(&dto)
+	if errJsonDecode != nil {
+		logger.LogError(errJsonDecode)
+		res.Message = fmt.Sprintf("json decoding error: %v", errJsonDecode)
+		json.NewEncoder(w).Encode(res)
+		return
+	}
+
+	service := services.NewService(entities.NewRepository(sh.env.GiveDbHandler().PassConnection(), entity), sh.env, &dto, entity, &history)
+	errService := service.UpdateItem(&dto)
+	if errService != nil {
+		logger.LogError(errService)
+		res.Message = fmt.Sprintf("service error: %v", errService)
+		json.NewEncoder(w).Encode(res)
+		return
+	}
+	res.Message = fmt.Sprintf("<<entity>> updated.")
+	json.NewEncoder(w).Encode(res)
+
+}
+
+func (sh ServerHandler) Delete<<entity>>(w http.ResponseWriter, r *http.Request) {
+	w.Header().Set("Context-Type", "application/json")
+	w.Header().Set("Access-Control-Allow-Origin", "*")
+	w.Header().Set("Access-Control-Allow-Methods", "DELETE")
+	w.Header().Set("Access-Control-Allow-Headers", "Content-Type")
+	logger := sh.env.GiveLogger()                                          // getting pointer of initialized logger
+	logger.InitLoggerPerFunc(logger.GetCurrentFuncName(), "delete <<entity.lowercase>> init") // initializing logger data for handler
+	defer logger.Log()
+
+	defer sh.recoverFromPanic() //default panic->recover
+	res := Response{
+		Message: "<<entity.lowercase>> deleting process started",
+	}
+
+	vars := mux.Vars(r)
+	id, _ := vars["id"]
+	idInt, errConv := strconv.Atoi(id)
+	if errConv != nil {
+		defer logger.LogError(errConv)
+		res.Message = fmt.Sprintf("couldn't convert given id, error: %v", errConv)
+		json.NewEncoder(w).Encode(res)
+		return
+	}
+	Id := uint(idInt)
+
+	service := services.NewService(entities.NewRepository(sh.env.GiveDbHandler().PassConnection(), entities.<<entity>>{}), sh.env, &dto.<<entity>>RequestDTO{}, entities.<<entity>>{}, &entities.<<entity>>History{})
+	errService := service.DeleteItem(Id)
+	if errService != nil {
+		defer logger.LogError(errService)
+		res.Message = fmt.Sprintf("service error: %v", errService)
+		json.NewEncoder(w).Encode(res)
+		return
+	}
+	res.Message = fmt.Sprintf("<<entity>> deleted.")
+	json.NewEncoder(w).Encode(res)
+
+}
